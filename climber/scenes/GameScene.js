@@ -7,6 +7,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('sky', 'assets/sky.jpg')
         this.load.image('grass', 'assets/grass.png')
         this.load.image('dirt', 'assets/dirt.png')
+        this.load.spritesheet('ball', 'assets/ball.png', { frameWidth: 16, frameHeight: 20 })
     }
 
     create() {
@@ -21,10 +22,24 @@ class GameScene extends Phaser.Scene {
         this.platforms.create(600, 400, 'grass').setScale(4, 1).refreshBody()
 
         //Player
-        this.player = this.physics.add.image(0, 764, 'dirt')
-        this.player.body.checkCollision.left = false
-        this.player.body.checkCollision.right = false
-        this.player.body.checkCollision.up = false
+        this.player = this.physics.add.sprite(100, 700, 'ball', 0)
+        this.player.setScale(2)
+        this.player.body.checkCollision.left   = false
+        this.player.body.checkCollision.right  = false
+        this.player.body.checkCollision.up     = false
+        this.anims.create({
+            key: 'ball-jump',
+            frames: this.anims.generateFrameNumbers('ball', { start: 8, end: 13 }),
+            frameRate: 20,
+        });
+        this.anims.create({
+            key: 'ball-land',
+            frames: this.anims.generateFrameNumbers('ball', { start: 1, end: 7 }),
+            frameRate: 20,
+        });
+        this.player.isFalling = false
+
+
         //Collisions
         this.player.setCollideWorldBounds(true)
 
@@ -36,21 +51,31 @@ class GameScene extends Phaser.Scene {
 
     update() {
         // Player movement
-        if (this.controls.LEFT.isDown || this.controls.A.isDown) {
-            this.player.setVelocityX(-250)
+        //if(this.player.body.onFloor()){
+            if (this.controls.LEFT.isDown || this.controls.A.isDown) {
+                this.player.setVelocityX(-250)
+                this.player.setFlipX(true)
 
-        } else if (this.controls.RIGHT.isDown || this.controls.D.isDown) {
-            this.player.setVelocityX(250)
-        } else {
-            this.player.setVelocityX(0)
-        }
+            } else if (this.controls.RIGHT.isDown || this.controls.D.isDown) {
+                this.player.setVelocityX(250)
+                this.player.setFlipX(false)
+            } else {
+                this.player.setVelocityX(0)
+            }
+        //}
 
         if (this.controls.SPACE.isDown && this.player.body.touching.down) {
-            this.player.setVelocityY(-250)
+            this.player.setVelocityY(-270)
+            this.player.anims.play('ball-jump')
+            this.player.isFalling = true
         }
         if (this.controls.DOWN.isDown || this.controls.S.isDown) {
             this.player.setVelocityX(0)
             this.player.setVelocityY(750)
+        }
+        if(!this.player.anims.isPlaying && this.player.isFalling && this.player.body.onFloor()){
+            this.player.anims.play('ball-land')
+            this.player.isFalling = false
         }
 
     }
