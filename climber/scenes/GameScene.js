@@ -11,6 +11,7 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.physics.world.setBounds(0, -10000, 600, 10800)
         this.add.image(300, 400, 'sky')
 
         //Platforms
@@ -20,6 +21,14 @@ class GameScene extends Phaser.Scene {
         this.platforms.create(0, 600, 'grass').setScale(4, 1).refreshBody()
         this.platforms.create(312, 500, 'grass').setScale(4, 1).refreshBody()
         this.platforms.create(600, 400, 'grass').setScale(4, 1).refreshBody()
+        this.platforms.create(600, 300, 'grass').setScale(4, 1).refreshBody()
+        this.platforms.create(400, 200, 'grass').setScale(4, 1).refreshBody()
+        this.platforms.create(200, 100, 'grass').setScale(4, 1).refreshBody()
+        this.platforms.create(300, 0, 'grass').setScale(4, 1).refreshBody()
+        this.platforms.create(500, -100, 'grass').setScale(4, 1).refreshBody()
+        this.platforms.create(600, -200, 'grass').setScale(4, 1).refreshBody()
+        this.platforms.create(200, -300, 'grass').setScale(4, 1).refreshBody()
+        
 
         //Player
         this.player = this.physics.add.sprite(100, 700, 'ball', 0)
@@ -47,6 +56,13 @@ class GameScene extends Phaser.Scene {
 
         //Controls
         this.controls = this.input.keyboard.addKeys('W,A,S,D,SPACE,LEFT,RIGHT,UP,DOWN')
+        this.cameras.main.setBounds(0, -10000, 600, 10800)
+        //this.cameras.main.startFollow(this.player)
+        //this.cameras.main.setDeadzone(600,400)
+        window.camerainfo = {
+            camera: this.cameras.main.scrollY,
+            player: this.player.y, 
+        }
     }
 
     update() {
@@ -77,6 +93,12 @@ class GameScene extends Phaser.Scene {
             this.player.anims.play('ball-land')
             this.player.isFalling = false
         }
+
+        //Camera
+        if(this.player.y < this.cameras.main.scrollY + this.cameras.main.height / 2){
+            this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2
+        }
+      
 
     }
 }
