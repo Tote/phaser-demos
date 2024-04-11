@@ -3,6 +3,8 @@ class GameScene extends Phaser.Scene {
     player
     controls
     lastPlatformHeigth
+    score
+    scoreText
 
     preload() {
         this.load.image('sky', 'assets/sky.jpg')
@@ -12,12 +14,19 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.score = 0
+        this.scoreText = this.add
+                            .text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' })
+                            .setScrollFactor(0)
+                            .setDepth(1)
         this.physics.world.setBounds(0, -10000, 600, 10800)
         this.add.image(300, 400, 'sky').setScrollFactor(0)
 
         //Platforms
         this.platforms = this.physics.add.staticGroup()
-        this.platforms.create(300, 800, 'grass').setScale(13, 1).refreshBody()
+        const p = this.platforms.create(300, 800, 'grass').setScale(13, 1).refreshBody()
+        p.wasBounced = true
+        
         this.lastPlatformHeigth = 800
 
         //Player
@@ -43,12 +52,20 @@ class GameScene extends Phaser.Scene {
 
 
         //Collisions
-        this.physics.add.collider(this.player, this.platforms)
+        this.physics.add.collider(this.player, this.platforms, (a,b)=>{
+            if(b != this.player && !b.wasBounced){
+                b.wasBounced = true
+                this.score++
+                this.scoreText.setText(`score: ${this.score}`)
+            } 
+        })
 
         //Controls
         this.controls = this.input.keyboard.addKeys('W,A,S,D,SPACE,LEFT,RIGHT,UP,DOWN')
         this.cameras.main.setBounds(0, -10000, 600, 10800)
 
+        //DEBUG
+        //PhaserGUIAction(this)
     }
 
     update() {
@@ -92,10 +109,11 @@ class GameScene extends Phaser.Scene {
         const _x = Phaser.Math.Between(0, 600)
         const _y = y || this.lastPlatformHeigth - 100
 
-        this.platforms
-            .create(_x, _y, 'grass')
-            .setScale(4, 1)
-            .refreshBody()
+        const platform = this.platforms
+                            .create(_x, _y, 'grass')
+                            .setScale(4, 1)
+                            .refreshBody()
+        platform.wasBounced = false
         this.lastPlatformHeigth = _y
     }
 }
