@@ -2,6 +2,7 @@ class GameScene extends Phaser.Scene {
     platforms
     player
     controls
+    lastPlatformHeigth
 
     preload() {
         this.load.image('sky', 'assets/sky.jpg')
@@ -19,15 +20,12 @@ class GameScene extends Phaser.Scene {
         this.platforms.create(300, 800, 'grass').setScale(13, 1).refreshBody()
         this.lastPlatformHeigth = 800
 
-        while (this.lastPlatformHeigth > 0) {
-            this.spawnPlatform()
-        }
-
-
         //Player
-        this.player = this.physics.add.sprite(100, 700, 'ball', 0)
-        this.player.setScale(2)
-        this.player.setDepth(1)
+        this.player = this.physics.add
+            .sprite(100, 700, 'ball', 0)
+            .setScale(2)
+            .setDepth(1)
+            .setCollideWorldBounds(true)
         this.player.body.checkCollision.left = false
         this.player.body.checkCollision.right = false
         this.player.body.checkCollision.up = false
@@ -45,8 +43,6 @@ class GameScene extends Phaser.Scene {
 
 
         //Collisions
-        this.player.setCollideWorldBounds(true)
-
         this.physics.add.collider(this.player, this.platforms)
 
         //Controls
